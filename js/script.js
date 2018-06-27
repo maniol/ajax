@@ -1,36 +1,53 @@
-var prefix = "https://cors-anywhere.herokuapp.com/";
-var tweetLink = 'https://twitter.com/intent/tweet?text=';
-var quoteUrl = 'https://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1';
-function getQuote() {
-	fetch(prefix + quoteUrl, { cache: "no-store" })
-		.then(function(resp) {
-			return resp.json();
+var url = 'https://restcountries.eu/rest/v1/name/';
+var countriesList = document.getElementById('countries');
+document.getElementById('search').addEventListener('click', searchCountries);
+function searchCountries() {
+	var countryName = document.getElementById('country-name').value;
+	if(!countryName.length) {
+		countryName = 'Poland';
+	}
+	fetch('https://restcountries.eu/rest/v2/name/' + countryName)
+		.then(function(response) {
+			return response.json();
 		})
-		.then(createTweet);
+		.then(showCountriesList);
 }
-function createTweet(input) {
-	var data = input[0];
-	var dataElement = document.createElement('div');
-	dataElement.innerHTML = data.content;
-	var quoteText = dataElement.innerText.trim();
-	var quoteAuthor = data.title;
-	if (!quoteAuthor.length) {
-		quoteAuthor = "Unknown author";
-	}
-	var tweetText = "Quote of the day - " + quoteText + " Author: " + quoteAuthor;
-	if (tweetText.length > 140) {
-		getQuote();
-	} else {
-		var tweet = tweetLink + encodeURIComponent(tweetText);
-		document.querySelector('.quote').innerText = quoteText;
-		document.querySelector('.author').innerText = "Author: " + quoteAuthor;
-		document.querySelector('.tweet').setAttribute('href', tweet);
-	}
+function getData(item) {
+	var countryData = {
+		flag: '',
+		name: '',
+		capital: '',
+		area: '',
+		population: '',
+		languages: '',
+		currencies: ''
+	};
+	countryData.flag = item.flag;
+	countryData.name = item.name;
+	countryData.capital = item.capital;
+	countryData.area = item.area;
+	countryData.population = item.population;
+	item.languages.forEach(function(el){
+		countryData.languages += el.name + ' ';
+	})
+	item.currencies.forEach(function(el){
+		countryData.currencies += el.name + '';
+	})
+	return countryData
 }
-document.addEventListener('DOMContentLoaded', function() {
-	getQuote();
-	document.querySelector('.trigger').addEventListener('click', function() {
-		getQuote();
+function getHTML(data) {
+	var templateTableEntry = document.getElementById('template-tableEntry').innerHTML;
+	Mustache.parse(templateTableEntry);
+	var tableEntryHTML = Mustache.render(templateTableEntry, data);
+	return tableEntryHTML
+}
+function showCountriesList(response) {
+	countriesList.innerHTML = '';
+	response.forEach(function(item) {
+		var liEl = document.createElement('li');
+		var data = getData(item);
+		var HTMLtableEntry = getHTML(data)
+		liEl.insertAdjacentHTML('beforeend', HTMLtableEntry);
+		countriesList.appendChild(liEl);
 	});
-});
-
+}
