@@ -37,6 +37,6 @@ $navy-blue: #000080;
 		height: 36px;
 	}
 }
-div{
-	padding:0;
+div[class^="col-"] {
+	padding: 0;
 }

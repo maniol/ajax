@@ -14,39 +14,30 @@ function searchCountries() {
 }
 function getData(item) {
 	var countryData = {
-		flag: '',
-		name: '',
-		capital: '',
-		area: '',
-		population: '',
-		languages: '',
-		currencies: ''
-	};
-	countryData.flag = item.flag;
-	countryData.name = item.name;
-	countryData.capital = item.capital;
-	countryData.area = item.area;
-	countryData.population = item.population;
-	item.languages.forEach(function(el){
-		countryData.languages += el.name + ' ';
-	})
-	item.currencies.forEach(function(el){
-		countryData.currencies += el.name + '';
-	})
-	return countryData
+		flag: item.flag,
+		name: item.name,
+		capital: item.capital,
+		area: item.area,
+		population: item.population,
+		languages: item.languages.map(function(el){
+			return el.name;}).join(' '),
+		currencies: item.currencies.map(function(el){
+			return el.name;}).join(' ')
+	}
+	return countryData;
 }
 function getHTML(data) {
 	var templateTableEntry = document.getElementById('template-tableEntry').innerHTML;
 	Mustache.parse(templateTableEntry);
 	var tableEntryHTML = Mustache.render(templateTableEntry, data);
-	return tableEntryHTML
+	return tableEntryHTML;
 }
 function showCountriesList(response) {
 	countriesList.innerHTML = '';
 	response.forEach(function(item) {
 		var liEl = document.createElement('li');
 		var data = getData(item);
-		var HTMLtableEntry = getHTML(data)
+		var HTMLtableEntry = getHTML(data);
 		liEl.insertAdjacentHTML('beforeend', HTMLtableEntry);
 		countriesList.appendChild(liEl);
 	});

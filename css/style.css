@@ -30,7 +30,7 @@
     background: #000080;
     height: 36px; }
 
-div {
+div[class^="col-"] {
   padding: 0; }
 
 /*# sourceMappingURL=style.css.map */
